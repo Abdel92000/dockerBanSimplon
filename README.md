@@ -26,6 +26,7 @@ docker-compose up
 ```
 
 Le conteneur va :
+
 - Créer la base de données `ban_schooldocker`
 - Exécuter automatiquement le script `init.sql`
 - Importer les données depuis `adresses-92.csv`
@@ -36,6 +37,7 @@ Le conteneur va :
 3. **Vérifier que tout fonctionne**
 
 Attendez de voir dans les logs :
+
 ```
 postgres_db  | CREATE TABLE
 postgres_db  | COPY [nombre de lignes]
@@ -43,7 +45,7 @@ postgres_db  | COPY [nombre de lignes]
 
 Si vous voyez des erreurs, consultez la section [Dépannage](#-dépannage).
 
-##  Réinitialiser la base de données
+## Réinitialiser la base de données
 
 Si vous modifiez le script `init.sql` ou si vous voulez réimporter les données :
 
@@ -58,13 +60,13 @@ docker-compose up
 
 ### Paramètres de connexion
 
-| Paramètre | Valeur |
-|-----------|--------|
-| **Host** | `localhost` |
-| **Port** | `5432` |
+| Paramètre    | Valeur             |
+| ------------ | ------------------ |
+| **Host**     | `localhost`        |
+| **Port**     | `5432`             |
 | **Database** | `ban_schooldocker` |
-| **User** | `postgres` |
-| **Password** | `postgres` |
+| **User**     | `postgres`         |
+| **Password** | `postgres`         |
 
 ### Connexion avec psql (ligne de commande)
 
@@ -94,12 +96,10 @@ SELECT COUNT(*) FROM voie;
 SELECT COUNT(*) FROM adresse;
 ```
 
-### 2. Requêtes de test
-
-```sql
+````sql
 -- Lister les 10 premières communes
-SELECT code_insee, nom_commune, code_poqtal 
-FROM commune 
+SELECT code_insee, nom_commune, code_poqtal
+FROM commune
 LIMIT 10;
 
 -- Trouver toutes les adresses d'une commune (ex: Bagneux)
@@ -128,19 +128,64 @@ WHERE v.nom_voie ILIKE '%rue%'
 GROUP BY v.nom_voie, c.nom_commune
 ORDER BY nb_adresses DESC
 LIMIT 10;
-```
+``` -->
+
+### 2. Requêtes de test
+
+```sql
+
+-- 1 Lister toutes les adresses d’une commune donnée (triées par numéro)
+
+SELECT
+    adresse.id_adresse,
+    voie.nom_voie,
+    adresse.numero,
+    adresse.rep,
+    adresse.lat,
+    adresse.lon
+FROM adresse
+JOIN voie ON adresse.id_voie = voie.id
+JOIN commune ON voie.id_commune = commune.id
+WHERE commune.nom_commune = 'Nanterre'
+ORDER BY voie.nom_voie, adresse.numero;
+
+-- 2 Compter le nombre d’adresses par commune et type de voie
+SELECT
+    commune.nom_commune,
+    COUNT(adresse.id_adresse) AS nombre_adresses
+FROM adresse
+JOIN voie ON adresse.id_voie = voie.id
+JOIN commune ON voie.id_commune = commune.id
+GROUP BY commune.nom_commune
+ORDER BY nombre_adresses DESC;
+
+
+-- 3 Lister les communes distinctes
+SELECT DISTINCT nom_commune
+FROM commune
+ORDER BY nom_commune;
+
+-- 4 Rechercher toutes les adresses contenant un mot-clé particulier dans le nom de voie
+SELECT
+    adresse.id_adresse,
+    voie.nom_voie,
+    adresse.numero
+FROM adresse
+JOIN voie ON adresse.id_voie = voie.id
+WHERE voie.nom_voie ILIKE '%motclé%';
+````
 
 ### 3. Vérifier l'intégrité des données
 
 ```sql
 -- Vérifier qu'il n'y a pas de doublons dans les communes
-SELECT code_insee, COUNT(*) 
-FROM commune 
-GROUP BY code_insee 
+SELECT code_insee, COUNT(*)
+FROM commune
+GROUP BY code_insee
 HAVING COUNT(*) > 1;
 
 -- Vérifier les relations entre tables
-SELECT 
+SELECT
     (SELECT COUNT(*) FROM commune) as nb_communes,
     (SELECT COUNT(*) FROM voie) as nb_voies,
     (SELECT COUNT(*) FROM adresse) as nb_adresses,
@@ -218,12 +263,13 @@ Le port 5432 est déjà utilisé. Modifiez le port dans `docker-compose.yml` :
 
 ```yaml
 ports:
-  - "5433:5432"  # Utilisez 5433 au lieu de 5432
+  - "5433:5432" # Utilisez 5433 au lieu de 5432
 ```
 
 ### Erreur lors de l'import CSV
 
 Si vous voyez des erreurs comme `invalid input syntax for type integer`, vérifiez que :
+
 - L'ordre des colonnes dans `init.sql` correspond à l'ordre dans le CSV
 - Le délimiteur est bien `;` (point-virgule)
 - Le fichier CSV a bien un en-tête (header)
