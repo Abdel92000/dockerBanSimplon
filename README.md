@@ -243,6 +243,102 @@ cad_parcelle (1) ──< (N) adresse
 
 ![MPD - Modèle Physique de Données](./Screenshot%202025-11-18%20at%2009.46.04.png)
 
+## 📖 Dictionnaire des données
+
+### Table `newtable` (Staging)
+
+Table temporaire contenant les données brutes importées depuis le CSV.
+
+| Colonne                       | Type         | Description                            |
+| ----------------------------- | ------------ | -------------------------------------- |
+| `id`                          | VARCHAR(250) | Identifiant unique de l'adresse        |
+| `id_fantoir`                  | VARCHAR(250) | Identifiant FANTOIR de la voie         |
+| `numero`                      | INT          | Numéro de l'adresse                    |
+| `rep`                         | TEXT         | Complément d'adresse (bis, ter, etc.)  |
+| `nom_voie`                    | VARCHAR(250) | Nom de la voie                         |
+| `code_postal`                 | INT          | Code postal                            |
+| `code_insee`                  | INT          | Code INSEE de la commune               |
+| `nom_commune`                 | VARCHAR(250) | Nom de la commune                      |
+| `code_insee_ancienne_commune` | VARCHAR(250) | Code INSEE de l'ancienne commune       |
+| `nom_ancienne_commune`        | VARCHAR(250) | Nom de l'ancienne commune              |
+| `x`                           | FLOAT4       | Coordonnée X (Lambert 93)              |
+| `y`                           | FLOAT4       | Coordonnée Y (Lambert 93)              |
+| `lon`                         | FLOAT4       | Longitude (WGS84)                      |
+| `lat`                         | FLOAT4       | Latitude (WGS84)                       |
+| `type_position`               | VARCHAR(50)  | Type de positionnement                 |
+| `alias`                       | VARCHAR(250) | Alias de l'adresse                     |
+| `nom_ld`                      | VARCHAR(250) | Nom du lieu-dit                        |
+| `libelle_acheminement`        | VARCHAR(255) | Libellé d'acheminement postal          |
+| `nom_afnor`                   | VARCHAR(250) | Nom normalisé AFNOR                    |
+| `source_position`             | VARCHAR(50)  | Source du positionnement               |
+| `source_nom_voie`             | VARCHAR(250) | Source du nom de voie                  |
+| `certification_commune`       | INT          | Niveau de certification par la commune |
+| `cad_parcelles`               | VARCHAR(250) | Références cadastrales                 |
+
+### Table `commune`
+
+| Colonne       | Type        | Description              | Contraintes |
+| ------------- | ----------- | ------------------------ | ----------- |
+| `id`          | SERIAL      | Identifiant unique       | PRIMARY KEY |
+| `code_insee`  | INT         | Code INSEE de la commune | UNIQUE      |
+| `code_poqtal` | VARCHAR(5)  | Code postal              | NOT NULL    |
+| `nom_commune` | VARCHAR(50) | Nom de la commune        | UNIQUE      |
+
+### Table `commune_ancienne`
+
+| Colonne                | Type         | Description                      | Contraintes                         |
+| ---------------------- | ------------ | -------------------------------- | ----------------------------------- |
+| `id`                   | SERIAL       | Identifiant unique               | PRIMARY KEY                         |
+| `code_insee_ancienne`  | VARCHAR(10)  | Code INSEE de l'ancienne commune |                                     |
+| `nom_ancienne_commune` | VARCHAR(255) | Nom de l'ancienne commune        |                                     |
+| `id_commune`           | INT          | Référence à la commune actuelle  | FOREIGN KEY → commune(id), NOT NULL |
+
+### Table `voie`
+
+| Colonne                | Type         | Description                    | Contraintes                         |
+| ---------------------- | ------------ | ------------------------------ | ----------------------------------- |
+| `id`                   | SERIAL       | Identifiant unique             | PRIMARY KEY                         |
+| `id_fantoir`           | VARCHAR(50)  | Identifiant FANTOIR de la voie |                                     |
+| `nom_voie`             | VARCHAR(250) | Nom de la voie                 |                                     |
+| `nom_afnor`            | VARCHAR(250) | Nom normalisé AFNOR            |                                     |
+| `libelle_acheminement` | VARCHAR(255) | Libellé d'acheminement postal  |                                     |
+| `source_nom_voie`      | VARCHAR(250) | Source du nom de voie          |                                     |
+| `id_commune`           | INT          | Référence à la commune         | FOREIGN KEY → commune(id), NOT NULL |
+
+### Table `lieu_dit`
+
+| Colonne  | Type        | Description        | Contraintes |
+| -------- | ----------- | ------------------ | ----------- |
+| `id`     | SERIAL      | Identifiant unique | PRIMARY KEY |
+| `nom_ld` | VARCHAR(50) | Nom du lieu-dit    |             |
+
+### Table `cad_parcelle`
+
+| Colonne         | Type         | Description            | Contraintes |
+| --------------- | ------------ | ---------------------- | ----------- |
+| `id`            | SERIAL       | Identifiant unique     | PRIMARY KEY |
+| `cad_parcelles` | VARCHAR(250) | Références cadastrales |             |
+
+### Table `adresse`
+
+| Colonne                 | Type         | Description                            | Contraintes                      |
+| ----------------------- | ------------ | -------------------------------------- | -------------------------------- |
+| `id_adresse`            | TEXT         | Identifiant unique de l'adresse        | PRIMARY KEY                      |
+| `numero`                | INT          | Numéro de l'adresse                    |                                  |
+| `rep`                   | TEXT         | Complément d'adresse (bis, ter, etc.)  |                                  |
+| `lat`                   | FLOAT        | Latitude (WGS84)                       |                                  |
+| `lon`                   | FLOAT        | Longitude (WGS84)                      |                                  |
+| `x`                     | FLOAT        | Coordonnée X (Lambert 93)              |                                  |
+| `y`                     | FLOAT        | Coordonnée Y (Lambert 93)              |                                  |
+| `type_position`         | VARCHAR(50)  | Type de positionnement                 |                                  |
+| `source_position`       | VARCHAR(50)  | Source du positionnement               |                                  |
+| `alias`                 | VARCHAR(250) | Alias de l'adresse                     |                                  |
+| `certification_commune` | INT          | Niveau de certification par la commune |                                  |
+| `libelle_acheminement`  | VARCHAR(250) | Libellé d'acheminement postal          |                                  |
+| `id_voie`               | INT          | Référence à la voie                    | FOREIGN KEY → voie(id), NOT NULL |
+| `id_lieu_dit`           | INT          | Référence au lieu-dit                  | FOREIGN KEY → lieu_dit(id)       |
+| `id_cad_parcelle`       | INT          | Référence à la parcelle cadastrale     | FOREIGN KEY → cad_parcelle(id)   |
+
 ## 🛠️ Commandes utiles
 
 ### Arrêter le conteneur
