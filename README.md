@@ -177,21 +177,6 @@ WHERE voie.nom_voie ILIKE '%motclé%';
 
 ### 3. Vérifier l'intégrité des données
 
-```sql
--- Vérifier qu'il n'y a pas de doublons dans les communes
-SELECT code_insee, COUNT(*)
-FROM commune
-GROUP BY code_insee
-HAVING COUNT(*) > 1;
-
--- Vérifier les relations entre tables
-SELECT
-    (SELECT COUNT(*) FROM commune) as nb_communes,
-    (SELECT COUNT(*) FROM voie) as nb_voies,
-    (SELECT COUNT(*) FROM adresse) as nb_adresses,
-    (SELECT COUNT(*) FROM newtable) as nb_lignes_csv;
-```
-
 ## 📁 Structure du projet
 
 ```
