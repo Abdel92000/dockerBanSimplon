@@ -229,6 +229,20 @@ lieu_dit (1) ──< (N) adresse
 cad_parcelle (1) ──< (N) adresse
 ```
 
+## 📊 Modèles de données
+
+### MCD - Modèle Conceptuel de Données
+
+![MCD - Modèle Conceptuel de Données](./Screenshot%202025-11-18%20at%2009.43.22.png)
+
+### MLD - Modèle Logique de Données
+
+![MLD - Modèle Logique de Données](./Screenshot%202025-11-18%20at%2009.45.35.png)
+
+### MPD - Modèle Physique de Données
+
+![MPD - Modèle Physique de Données](./Screenshot%202025-11-18%20at%2009.46.04.png)
+
 ## 🛠️ Commandes utiles
 
 ### Arrêter le conteneur
